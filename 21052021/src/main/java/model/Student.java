@@ -1,3 +1,7 @@
+package model;
+
+import helper.RandomNumberGenerator;
+
 public class Student {
     private String id;
     private static int idCount;
@@ -7,20 +11,22 @@ public class Student {
     private String email;
     private String fatherName;
 
-    public Student() {}
-    public Student(String name, String surName,String fatherName,String email,String phoneNumber) {
-        idCount++;
+    public Student() {
+    }
+
+    public Student(String name, String surName, String fatherName, String email, String phoneNumber) {
+        idCount = RandomNumberGenerator.getRandomNumber(100000, 999999);
         this.id = "St" + idCount;
         this.name = name;
         this.surName = surName;
-        this.fatherName=fatherName;
-        this.email=email;
-        this.phoneNumber=phoneNumber;
+        this.fatherName = fatherName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
     }
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
-
 
 
     public void setPhoneNumber(String phoneNumber) {
@@ -42,6 +48,7 @@ public class Student {
     public void setFatherName(String fatherName) {
         this.fatherName = fatherName;
     }
+
     public String getName() {
         return name;
     }

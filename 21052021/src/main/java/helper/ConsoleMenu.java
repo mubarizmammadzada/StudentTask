@@ -1,27 +1,28 @@
+package helper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import helper.Crud;
+import helper.Search;
+import model.Student;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
 
-import java.nio.file.Files;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+public class ConsoleMenu {
 
-public class Main {
-    ;
+    private Scanner scanner = new Scanner(System.in);
+    Map<String, Student> studentHashMap = new HashMap<>();
+    Search search = new Search();
+    Crud crud = new Crud(scanner);
 
-    public static void main(String[] args) throws IOException {
-        Map<String, Student> studentHashMap = new HashMap<>();
-//        ObjectMapper mapperr = new ObjectMapper();
-////        mapperr.enable(SerializationFeature.INDENT_OUTPUT);
-//        Student stu = new Student("Salam", "asd", "asd", "asdasd", "asdasd");
-//        studentHashMap.put(stu.getId(),stu);
-//        mapperr.writeValue(new File("student.json"), studentHashMap);
+
+    public void consoleMenu() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         File f = new File("student.json");
@@ -76,7 +77,7 @@ public class Main {
                     } while (!isNumber1);
                     switch (selectionCount1) {
                         case 1:
-                            create(studentHashMap);
+                            addStudent(studentHashMap);
                             System.out.println("Student created");
                             isContinued = true;
                             break;
@@ -104,7 +105,7 @@ public class Main {
                                 }
                             } while (!isExist);
 
-                            delete(studentHashMap, student.get(), idForDeletingString);
+                            deleteStudent(studentHashMap, student.get(), idForDeletingString);
                             System.out.println("Student Deleted");
                             for (Student stu : studentHashMap.values()) {
                                 System.out.println(stu.getId() + " " + stu.getName());
@@ -160,7 +161,7 @@ public class Main {
                                         System.out.println("Enter 1-5 number");
                                         isSelection = false;
                                     }
-                                    update(studentHashMap, stu.get(), selectionCount);
+                                    updateStudent(studentHashMap, stu.get(), selectionCount);
                                     do {
                                         System.out.println("do you want to continue? (y-yes,n-no)");
                                         Scanner scanner = new Scanner(System.in);
@@ -179,11 +180,7 @@ public class Main {
                             isContinued = true;
                             break;
                         case 4:
-                            for (Student s : studentHashMap.values()) {
-                                System.out.println(s.getId() + "," + s.getName() + ","
-                                        + s.getSurName() + "," + s.getFatherName() + ","
-                                        + s.getEmail() + "," + s.getPhoneNumber());
-                            }
+                            crud.read(studentHashMap);
                             isContinued = true;
                             break;
                     }
@@ -212,27 +209,28 @@ public class Main {
                             isNumber1 = false;
                         }
                     } while (!isNumberr);
-                switch (selectionCount2){
-                    case 1:
-                        System.out.println("Enter name");
-                        Scanner scanner=new Scanner(System.in);
-                        String name=scanner.next();
-                        searchByName(studentHashMap,name);
-                        break;
-                    case 2:
-                        System.out.println("Enter surname");
-                        Scanner scanner1=new Scanner(System.in);
-                        String surname=scanner1.next();
-                        searchBySurname(studentHashMap,surname);
-                        break;
-                    case 3:
-                        System.out.println("Enter Father name");
-                        Scanner scanner2=new Scanner(System.in);
-                        String fatherName=scanner2.next();
-                        searchByFatherName(studentHashMap,fatherName);
-                        break;
+                    switch (selectionCount2) {
 
-                }
+                        case 1:
+                            System.out.println("Enter name");
+                            Scanner scanner = new Scanner(System.in);
+                            String name = scanner.next();
+                            search.searchByName(studentHashMap, name);
+                            break;
+                        case 2:
+                            System.out.println("Enter surname");
+                            Scanner scanner1 = new Scanner(System.in);
+                            String surname = scanner1.next();
+                            search.searchBySurname(studentHashMap, surname);
+                            break;
+                        case 3:
+                            System.out.println("Enter Father name");
+                            Scanner scanner2 = new Scanner(System.in);
+                            String fatherName = scanner2.next();
+                            search.searchByFatherName(studentHashMap, fatherName);
+                            break;
+
+                    }
 
 
             }
@@ -241,146 +239,16 @@ public class Main {
 
     }
 
-    public static void create(Map<String, Student> studentHashMap) throws IOException {
-        System.out.println("Enter Student Name");
-        Scanner scanner = new Scanner(System.in);
-        String studentNameCreate = scanner.next();
-        System.out.println("Enter Student Surname");
-        Scanner scanner1 = new Scanner(System.in);
-        String studentSurnameCreate = scanner1.next();
-        System.out.println("Enter Student  Father Name");
-        Scanner scanner2 = new Scanner(System.in);
-        String studentFatherNameCreate = scanner2.next();
-        System.out.println("Enter Student Email");
-        boolean isEmail = true;
-        String studentEmailCreate;
-        do {
-            System.out.println("Enter Student email");
-            Scanner scanner3 = new Scanner(System.in);
-            studentEmailCreate = scanner.next();
-            if (!studentEmailCreate.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-                isEmail = false;
-            } else {
-                isEmail = true;
-            }
-        } while (!isEmail);
-
-        boolean isPhoneNumber = true;
-        String studentPhoneNumberCreate;
-        do {
-            System.out.println("Enter Student Phone Number");
-            Scanner scanner3 = new Scanner(System.in);
-            studentPhoneNumberCreate = scanner.next();
-            if (!studentPhoneNumberCreate.matches("^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$")) {
-                isPhoneNumber = false;
-            } else {
-                isPhoneNumber = true;
-            }
-        } while (!isPhoneNumber);
-        Student newStudent = new Student(studentNameCreate, studentSurnameCreate, studentFatherNameCreate,
-                studentEmailCreate, studentPhoneNumberCreate);
-        studentHashMap.put(newStudent.getId(), newStudent);
-        ObjectMapper mapper1 = new ObjectMapper();
-        mapper1.writeValue(new File("student.json"), studentHashMap);
-
+    public void addStudent(Map<String, Student> studentMap) throws IOException {
+        crud.create(studentMap);
     }
 
-    public static void delete(Map<String, Student> studentMap, Student student, String id) throws IOException {
-
-        studentMap.remove(student.getId());
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new File("student.json"), studentMap);
-
-
+    public void updateStudent(Map<String, Student> studentMap, Student student, int id) throws IOException {
+        crud.update(studentMap, student, id);
     }
 
-    public static void update(Map<String, Student> studentMap, Student stu, int selectionNumber) throws IOException {
-
-        switch (selectionNumber) {
-            case 1:
-                System.out.println("Enter Student Name");
-                Scanner scanner = new Scanner(System.in);
-                String studentNameUpdate = scanner.next();
-                stu.setName(studentNameUpdate);
-                break;
-            case 2:
-                System.out.println("Enter Student Surname");
-                Scanner scanner1 = new Scanner(System.in);
-                String studentSurnameUpdate = scanner1.next();
-                stu.setSurName(studentSurnameUpdate);
-                break;
-            case 3:
-                System.out.println("Enter Student  Father Name");
-                Scanner scanner2 = new Scanner(System.in);
-                String studentFatherNameUpdate = scanner2.next();
-                stu.setFatherName(studentFatherNameUpdate);
-                break;
-            case 4:
-                System.out.println("Enter Student Email");
-                boolean isEmail = true;
-                String studentEmailUpdate;
-                do {
-                    System.out.println("Enter Student email");
-                    Scanner scanner3 = new Scanner(System.in);
-                    studentEmailUpdate = scanner3.next();
-                    if (!studentEmailUpdate.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-                        isEmail = false;
-                    } else {
-                        isEmail = true;
-                    }
-                } while (!isEmail);
-                stu.setEmail(studentEmailUpdate);
-                break;
-            case 5:
-                boolean isPhoneNumber = true;
-                String studentPhoneNumberUpdate;
-                do {
-                    System.out.println("Enter Student Phone Number");
-                    Scanner scanner4 = new Scanner(System.in);
-                    studentPhoneNumberUpdate = scanner4.next();
-                    if (!studentPhoneNumberUpdate.matches("^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$")) {
-                        isPhoneNumber = false;
-                    } else {
-                        isPhoneNumber = true;
-                    }
-                } while (!isPhoneNumber);
-                stu.setPhoneNumber(studentPhoneNumberUpdate);
-                break;
-
-
-        }
-        studentMap.put(stu.getId(), stu);
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new File("student.json"), studentMap);
-
-
+    public void deleteStudent(Map<String, Student> studentMap, Student student, String id) throws IOException {
+        crud.delete(studentMap, student, id);
     }
 
-    public static void searchByName(Map<String,Student> studentMap,String name){
-        List<Student> students=studentMap.values().stream()
-                .filter(s->s.getName().trim().toLowerCase().startsWith(name)).collect(Collectors.toList());
-        for (Student s:students){
-            System.out.println(s.getId() + "," + s.getName() + ","
-                    + s.getSurName() + "," + s.getFatherName() + ","
-                    + s.getEmail() + "," + s.getPhoneNumber());
-        }
-    }
-    public static void searchBySurname(Map<String,Student> studentMap,String surname){
-        List<Student> students=studentMap.values().stream()
-                .filter(s->s.getSurName().trim().toLowerCase().startsWith(surname)).collect(Collectors.toList());
-        for (Student s:students){
-            System.out.println(s.getId() + "," + s.getName() + ","
-                    + s.getSurName() + "," + s.getFatherName() + ","
-                    + s.getEmail() + "," + s.getPhoneNumber());
-        }
-    }
-    public static void searchByFatherName(Map<String,Student> studentMap,String fatherName){
-        List<Student> students=studentMap.values().stream()
-                .filter(s->s.getFatherName().trim().toLowerCase().startsWith(fatherName)).collect(Collectors.toList());
-        for (Student s:students){
-            System.out.println(s.getId() + "," + s.getName() + ","
-                    + s.getSurName() + "," + s.getFatherName() + ","
-                    + s.getEmail() + "," + s.getPhoneNumber());
-        }
-    }
 }
